@@ -1,0 +1,68 @@
+--Cíl úlohy--
+  Cílem úlohy je umìt vyøešit zadanou zamíchanou rubikovu kostku. Tu mùže uživatel nahrát ze souboru, nebo si vygenerovat náhodnou. Dùraz se klade na efektivitu (tedy poèet tahù) a rychlost øešení.
+
+--Popis vstupù a výstupu--
+  Všechny vstupy a výstupy jsou pøes grafické rozhraní (viz. dále) Formát vstupních souboru s rubikovou kostkou je následující. Kostku rozbalíme do  následujícího pláštì.
+ 
+  ---     U = up
+  |U|     L = left
+-------   F = front
+|L|F|R|   R = right
+-------   D = down
+  |D|     B = back
+  ---
+  |B|
+  ---
+ 
+Na šest øádkù pod sebou postupnì napíšeme rozmístìní jednotlivých stran (v poøadí ULFRDB), kde každý øádek obsahuje 9 barev na stranì v tomto poøadí. Barvy jsou oznaèeny pøíslušnými stranami (tedy ULFRDB).
+
+  -----
+  |123|
+  |456|
+  |789|
+  -----
+ 
+Vstup tedy mùže vypadat takto:
+
+RUBLUBLUD
+BDDLLRUBU
+FLRFFDFFF
+FUUFRRUUD
+LLRRDRLBL
+BDBBBDDFR
+
+-- popis obrazovek --
+  Rozhraní je docela jednoduché.
+ 
+  randomize - vytvoøí náhodné zamíchání kostky
+  open from file - naète zamíchání kostky ze souboru
+  solve - zaène øešit aktuální rubikovu kostku
+  animate - postupnì projde všechny kroky posledního nalezeného øešení.
+ 
+-- popis struktury programu --
+  Za zmínku stojí tøi dùležité tøídy programu.
+  Rubik - hlavní tøída, obsahuje všechny øídící prvky a funguje jako rozhraní mezi uživatelem a samotným programem.
+  Solver - tøída, jejíž úkolem je samotnì øešení kostky. Používá dvouvrstvé A* prohledávání, kde heuristická funkce je pøedem poèítána.
+  CubeState - Stav neboli zamíchání kostky. Je to ve své podstatì grupa, kde generující prvky jsou možné pohyby kostky. Skládá se z grupy permutací a orientací hran a rohù kostky. Jedná se tedy o semidirektní souèin tìchto grup.
+ 
+-- popis øešení --
+  Generátory jsou oznaèeny písmenkem strany, kterou se hýbe. napø.:
+U - pohyb horní strany o jedna ve smìru hodinových ruèièek
+U2 - pohyb horní strany o dva
+U' - pohyb horní strany o jedna proti smìru hodinových ruèièek
+
+  Hledání øešení se dìlí na dvì èásti. Nejdøíve pomocí A* algoritmu najdeme posloupnost generátorù, kterými se dostaneme do podgrupy <U,D,L2,R2,F2,B2>. Pak podobným algoritmem najdeme posloupnost generátorù, které vedou k øešení v této podgrupì. Maximální poèet tahù je nastaven na 21 a timeout na 10 vteøin.
+
+-- heuristiky pro A* --
+  Jako heuristiku pro obì hledání používáme maximum z minimálního poètu krokù, které je potøeba udìlat, aby se hrany dostali na správná místa a poètu krokù, které je potøeba udìlat, aby se rohy dostali na správná místa. Tyto poèty si program pøedpoèítá pøi prvním spuštìní a uloží do souborù.
+
+-- testovací data --
+  Ve složce testData jsou tøi testovací vstupy pro program
+test1 - správnì zadaná kostka a program ji dokáže složit
+test2 - chybnì zadaná kostka
+test3 - správnì zadaná kostka a program ji nezvládne složit
+
+-- nedostatky --
+  I když program umí nalézt øešení pomìrnì rychle (v rámci pár sekund), stále existují stavy kostky, které neumí složit ani za dlouhou dobu. To mùže být vinou pøíliš podhodnocené heuristiky.
+
+  I když si program pøedpoèítané výsledky uloží do souborù, jejich nahrávání na zaèátku zabírá relativnì stejnì èasu, jako jejich opìtovné poèítaní.
